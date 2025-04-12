@@ -1,19 +1,23 @@
 const express = require("express");
 const axios = require("axios");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 app.use(express.json());
 
-const WABLAS_TOKEN = "Up34hvEKA2KpLgRtYRu6oa06AoDxEDcFsyXI0zoa34RAKVYWUiEpI6A"; // Reemplazá por tu token real
+// 🔐 Token de Wablas
+const WABLAS_TOKEN = "TU_TOKEN_WABLAS"; // Reemplazá por tu token real
 
+// 🟢 Mensaje de bienvenida
 const mensajeBienvenida = `
 👋 *Bienvenido/a!*
 
 *✨ Elegí un servicio:* (desplegable)
 Tocá el botón "Ver opciones" para abrir el menú.`;
 
+// 💳 Formas de pago
 const formasPago = `
+
 💳 *Formas de Pago:*
 (*Giro* 🙅🏻‍♂️ no carga de billetera)
 
@@ -31,11 +35,12 @@ const formasPago = `
 ➯ Eko: 0992598035  
 ➯ Wally: 0982832010`;
 
-const ultimosSaludos = {}; // Guarda el momento del último saludo
+const ultimosSaludos = {};
 
+// 📤 Enviar mensaje simple
 const sendMessage = async (numero, mensaje) => {
   try {
-    await axios.post("https://console.wablas.com/api/send-message", {
+    await axios.post("https://bdg.wablas.com/api/send-message", {
       phone: numero,
       message: mensaje
     }, {
@@ -46,9 +51,10 @@ const sendMessage = async (numero, mensaje) => {
   }
 };
 
+// 📤 Enviar lista interactiva
 const sendListMessage = async (numero) => {
   try {
-    await axios.post("https://console.wablas.com/api/v2/send-message", {
+    await axios.post("https://bdg.wablas.com/api/v2/send-message", {
       phone: numero,
       isList: true,
       message: {
@@ -94,37 +100,43 @@ const sendListMessage = async (numero) => {
   }
 };
 
+// 📥 Importar respuestas automáticas
 const respuestas = require("./respuestas_rowid.js");
 
+// 📩 Webhook
 app.post("/", async (req, res) => {
   const mensaje = (req.body.message || "").toLowerCase().trim();
   const numero = req.body.phone;
   const ahora = Date.now();
-  const MILISEGUNDOS_1MIN = 60 * 1000; // ← para pruebas: solo 1 minuto
+  const MILISEGUNDOS_24HS = 24 * 60 * 60 * 1000;
 
-  if (!ultimosSaludos[numero] || ahora - ultimosSaludos[numero] > MILISEGUNDOS_1MIN) {
-    console.log("📨 Enviando bienvenida y lista a", numero);
+  // ✅ Enviar mensaje de bienvenida + lista si pasaron más de 24h
+  if (!ultimosSaludos[numero] || ahora - ultimosSaludos[numero] > MILISEGUNDOS_24HS) {
+    console.log("🟢 Enviando bienvenida y lista a", numero);
     await sendMessage(numero, mensajeBienvenida);
     await sendListMessage(numero);
     ultimosSaludos[numero] = ahora;
     return res.sendStatus(200);
   }
 
+  // 💳 Si el cliente selecciona "formas de pago"
   if (mensaje === "formas_pago") {
     await sendMessage(numero, formasPago);
     return res.sendStatus(200);
   }
 
+  // 🧠 Respuestas por rowId
   if (respuestas[mensaje]) {
     await sendMessage(numero, respuestas[mensaje]);
     return res.sendStatus(200);
   }
 
-  res.sendStatus(200); // Responde OK si no coincide con nada
+  res.sendStatus(200);
 });
 
+// 🌐 Página base
 app.get("/", (req, res) => {
-  res.send("Bot online ✅");
+  res.send("✅ Bot online y funcionando.");
 });
 
 app.listen(PORT, () => {
