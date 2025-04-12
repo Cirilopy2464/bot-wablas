@@ -1,11 +1,11 @@
 const express = require("express");
 const axios = require("axios");
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
 
-const WABLAS_TOKEN = "Up34hvEKA2KpLgRtYRu6oa06AoDxEDcFsyXI0zoa34RAKVYWUiEpI6A";
+const WABLAS_TOKEN = "AQUÍ_TU_TOKEN_WABLAS"; // Reemplazá por tu token real
 
 const mensajeBienvenida = `
 👋 *Bienvenido/a!*
@@ -14,7 +14,6 @@ const mensajeBienvenida = `
 Tocá el botón "Ver opciones" para abrir el menú.`;
 
 const formasPago = `
-
 💳 *Formas de Pago:*
 (*Giro* 🙅🏻‍♂️ no carga de billetera)
 
@@ -32,7 +31,7 @@ const formasPago = `
 ➯ Eko: 0992598035  
 ➯ Wally: 0982832010`;
 
-const ultimosSaludos = {};
+const ultimosSaludos = {}; // Guarda el momento del último saludo
 
 const sendMessage = async (numero, mensaje) => {
   try {
@@ -43,7 +42,7 @@ const sendMessage = async (numero, mensaje) => {
       headers: { Authorization: WABLAS_TOKEN }
     });
   } catch (error) {
-    console.error("Error al enviar mensaje:", error.response?.data || error.message);
+    console.error("❌ Error al enviar mensaje:", error.response?.data || error.message);
   }
 };
 
@@ -91,7 +90,7 @@ const sendListMessage = async (numero) => {
       headers: { Authorization: WABLAS_TOKEN }
     });
   } catch (error) {
-    console.error("Error al enviar lista:", error.response?.data || error.message);
+    console.error("❌ Error al enviar lista:", error.response?.data || error.message);
   }
 };
 
@@ -101,9 +100,10 @@ app.post("/", async (req, res) => {
   const mensaje = (req.body.message || "").toLowerCase().trim();
   const numero = req.body.phone;
   const ahora = Date.now();
-  const MILISEGUNDOS_24HS = 60 * 1000;
+  const MILISEGUNDOS_1MIN = 60 * 1000; // ← para pruebas: solo 1 minuto
 
-  if (!ultimosSaludos[numero] || ahora - ultimosSaludos[numero] > MILISEGUNDOS_24HS) {
+  if (!ultimosSaludos[numero] || ahora - ultimosSaludos[numero] > MILISEGUNDOS_1MIN) {
+    console.log("📨 Enviando bienvenida y lista a", numero);
     await sendMessage(numero, mensajeBienvenida);
     await sendListMessage(numero);
     ultimosSaludos[numero] = ahora;
@@ -120,7 +120,7 @@ app.post("/", async (req, res) => {
     return res.sendStatus(200);
   }
 
-  res.sendStatus(200);
+  res.sendStatus(200); // Responde OK si no coincide con nada
 });
 
 app.get("/", (req, res) => {
