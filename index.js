@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 
 // Configurá tu API KEY y endpoint de Wablas
-const API_KEY = "TU_API_KEY";
+const API_KEY = "Up34hvEKA2KpLgRtYRu6oa06AoDxEDcFsyXI0zoa34RAKVYWUiEpI6A";
 const API_URL = "https://console.wablas.com/api/send-message"; // o el endpoint correcto según tu cuenta
 
 const headers = {
