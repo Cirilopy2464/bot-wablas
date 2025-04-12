@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // 🔐 Token de Wablas
-const WABLAS_TOKEN = "TU_TOKEN_WABLAS"; // Reemplazá por tu token real
+const WABLAS_TOKEN = "Up34hvEKA2KpLgRtYRu6oa06AoDxEDcFsyXI0zoa34RAKVYWUiEpI6A"; // Reemplazá por tu token real
 
 // 🟢 Mensaje de bienvenida
 const mensajeBienvenida = `
