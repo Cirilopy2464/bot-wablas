@@ -101,7 +101,7 @@ app.post("/", async (req, res) => {
   const mensaje = (req.body.message || "").toLowerCase().trim();
   const numero = req.body.phone;
   const ahora = Date.now();
-  const MILISEGUNDOS_24HS = 24 * 60 * 60 * 1000;
+  const MILISEGUNDOS_24HS = 60 * 1000;
 
   if (!ultimosSaludos[numero] || ahora - ultimosSaludos[numero] > MILISEGUNDOS_24HS) {
     await sendMessage(numero, mensajeBienvenida);
